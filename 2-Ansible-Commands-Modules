@@ -1,0 +1,43 @@
+####################################################################################################################
+Ansible adhoc commands
+All the actions will reflect in your ansible user directory
+
+To check public ip of node --->
+ansible all -a "curl ifconfig.me"
+ 
+To create empty file --->
+ansible all -a "touch file.xml"
+ansible all -a "touch sample.txt"
+
+To create directory --->
+ansible all -a "mkdir sample"
+
+To list items --->
+ansible all -a "ls -ltr"
+####################################################################################################################
+Ansible adhoc commands
+
+All the actions will reflect in outside ansible user directory so we need to become root using -b
+ansible all -ba "yum install tree -y"
+ansible all -ba "yum remove tree -y"
+ansible all -ba "yum install httpd -y"
+ansible all -ba "yum remove httpd -y"
+ansible all -ba "yum install httpd -y"
+ansible all -ba "service httpd restart"
+
+
+####################################################################################################################
+Ansible Modules
+
+Copy
+ansible all -b -m copy -a "src=index.html dest=/var/www/html"
+
+Yum
+ansible all -bm yum -a "pkg=httpd state=present"
+ansible all -bm yum -a "pkg=httpd state=latest"
+ansible all -bm yum -a "pkg=httpd state=absent"
+
+Service
+ansible all -bm service -a "name=httpd state=started"
+ansible all -bm service -a "name=httpd state=stopped"
+ansible all -bm service -a "name=httpd state=reloaded"
