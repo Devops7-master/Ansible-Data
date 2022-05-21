@@ -1,0 +1,187 @@
+To run playbook
+ansible-playbook 1.yaml --check
+ansible-playbook 2.yaml --check
+ansible-playbook 3.yaml --check
+ansible-playbook 4.yaml --check
+
+
+#############################################################################################################
+
+
+[ansible@ip-172-31-19-198 ~]$ cat 1.yaml
+--- #Test
+- hosts: all
+  connection: ssh
+  user: ansible
+  gather_facts: yes
+  become: yes
+
+#############################################################################################################
+
+[ansible@ip-172-31-19-198 ~]$ cat 2.yaml
+--- #Sngle Task
+- hosts: all
+  user: ansible
+  become: yes
+  connection: ssh
+  gather_facts: yes
+
+  tasks:
+    - name: install git
+      action: yum pkg=git state=present
+      
+ #############################################################################################################
+
+ 
+[ansible@ip-172-31-19-198 ~]$ cat 3.yaml
+--- #Multi task
+- hosts: all
+  user: ansible
+  connection: ssh
+  become: yes
+  gather_facts: yes
+
+  tasks:
+
+    - name: install httpd
+      action: yum pkg=httpd state=present
+
+    - name: start httpd
+      action: service name=httpd state=started
+
+    - name: deploy code
+      action: copy src=index.html dest=/var/www/html
+
+
+#############################################################################################################
+
+
+[ansible@ip-172-31-19-198 ~]$ cat 4.yaml
+--- #Variable into Playbook
+- hosts: all
+  user: ansible
+  connection: ssh
+  become: yes
+  gather_facts: yes
+
+  vars:
+    pkgname: httpd
+    index_path: /var/www/html
+
+  tasks:
+    - name: install httpd
+      action: yum pkg=httpd state=present
+    - name: start httpd
+      action: service name="{{pkgname}}" state=started
+    - name: deploy
+      action: copy src=index.html dest="{{index_path}}"
+      
+#############################################################################################################     
+      
+      
+[ansible@ip-172-31-19-198 ~]$ cat 5.yaml
+--- #Handles in Playbook
+- hosts: all
+  become: yes
+  connection: ssh
+  user: ansible
+  gather_facts: yes
+
+  tasks:
+    - name: install apache
+      action: yum pkg=httpd state=present
+      notify: start service
+
+  handlers:
+    - name: start service
+      action: service name=httpd state=started
+
+
+
+#############################################################################################################
+
+
+
+[ansible@ip-172-31-19-198 ~]$ cat 6.yaml
+--- #Multiple handlers in Playbook
+- hosts: all
+  user: ansible
+  connection: ssh
+  become: yes
+  gather_facts: yes
+
+  tasks:
+    - name: install apache
+      action: yum pkg=httpd state=present
+      notify:
+        - start
+        - deploy
+
+  handlers:
+    - name: start
+      action: service name=httpd state=started
+    - name: deploy
+      action: copy src=index.html dest=/var/www/html
+
+
+#############################################################################################################
+
+
+[ansible@ip-172-31-19-198 ~]$ cat 7.yaml
+--- #Loop in Playbook
+- hosts: all
+  user: ansible
+  connection: ssh
+  become: yes
+  gather_facts: yes
+
+  tasks:
+    - name: print
+      command: echo "{{item}}"
+      loop:
+        - "one"
+        - "two"
+        - "three"
+
+
+#############################################################################################################
+
+
+
+[ansible@ip-172-31-19-198 ~]$ cat 8.yaml
+--- #When condition in Playbook
+- hosts: all
+  user: ansible
+  connection: ssh
+  become: yes
+  gather_facts: yes
+
+  tasks:
+    - name: install apache ubuntu
+      command: apt-get install apache -y
+      when: ansible_os_family=="Debian"
+
+    - name: install apaceh redhat
+      command: yum install httpd -y
+      when: ansible_os_family=="Redhat"
+
+
+#############################################################################################################
+
+
+
+[ansible@ip-172-31-19-198 ~]$ cat 9.yaml
+--- #When with variable
+- hosts: all
+  connection: ssh
+  become: yes
+  user: ansible
+  gather_facts: yes
+
+  vars:
+    value: 10
+
+  tasks:
+    - name: check value
+      command: yum install tree -y
+      when: value==9
