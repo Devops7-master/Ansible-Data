@@ -40,6 +40,16 @@ PasswordAuthentication yes        ---> uncomment this line
 save it
 
 service sshd restart
+
+vi /etc/ansible/hosts
+add ip of your node into hosts
+save it
+
+ vi /etc/ansible/ansible.cfg
+inventory      = /etc/ansible/hosts                   ---> uncomment this line
+sudo_user      = root                                 ---> uncomment this line
+save it
+
 #######################################################################################################################
 
 Now login as ansible user
