@@ -1,0 +1,55 @@
+##########################################
+        Ansible Server Installation
+##########################################
+
+
+
+Search "Extra Packages for Enterprise Linux" on Google and Go to below link --->
+https://docs.fedoraproject.org/en-US/epel/
+
+https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+wget the above rpm package into your machine.
+
+To install epel packeage --->
+yum install epel-release-latest-7.noarch.rpm -y
+
+To update system --->
+yum update -y
+
+To install ansible --->
+yum install ansible -y
+
+#######################################################################################################################
+Now we have to create one user for configuration management into server machine as well as node machines.
+
+useradd ansible
+passwd ansible
+
+visudo
+ansible All=(ALL)      NOPASSWD: ALL
+
+ctrl+D ---> logout
+sudo su -
+
+vi /etc/ssh/sshd_config
+
+PermitRootLogin yes               ---> uncomment this line
+PasswordAuthentication yes        ---> uncomment this line
+#PasswordAuthentication no        ---> comment this line
+
+save it
+
+service sshd restart
+#######################################################################################################################
+
+Now login as ansible user
+ssh-keygen ---> enter, enter, enter
+
+cd .ssh
+
+ssh-copy-id ansible@private-ip-of-node
+yes
+it will ask for password
+
+
+Now your ansible connection will be established from server to node
